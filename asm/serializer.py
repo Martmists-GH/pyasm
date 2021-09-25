@@ -110,17 +110,3 @@ class Serializer:
                                       co_nlocals=len(self.code.co_varnames) + self.code.co_argcount)
         # dis(self.code)
         return self.code
-
-
-if __name__ == "__main__":
-    def x(param: int) -> str:
-        for j in range(param):
-            if param < 20:
-                return "a" + chr(param)
-            else:
-                return "B" * param
-
-    d = Deserializer(x.__code__)
-    ops = d.deserialize()
-    s = Serializer(ops, x.__code__)
-    dis(s.serialize())
