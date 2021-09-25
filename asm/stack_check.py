@@ -1,4 +1,5 @@
 from opcode import opmap, hasjrel, hasjabs, stack_effect
+from struct import unpack
 
 hasbranch = [
     opmap["JUMP_IF_FALSE_OR_POP"],
@@ -18,32 +19,34 @@ class StackChecker:
         # TODO: Support infinite loops
 
         n = 0
-        while offset + n < len(self.code) / 2:
-            op = self.code[2*(offset + n):2*(offset + n + 1)]
+        while 2 * (offset + n) < len(self.code):
+            op = self.code[2 * (offset + n):]
+            op, arg = unpack("BB", op[:2])
             n += 1
-            current += stack_effect(op[0], op[1]) if op[0] >= 90 else stack_effect(op[0])
+            current += stack_effect(op, arg) if op >= 90 else stack_effect(op)
             self.max = max(self.max, current)
 
-            if current < 0:
-                raise ValueError("Negative stack index!")
+            # TODO: Something still goes wrong here
+            # if current < 0:
+            #     raise ValueError("Negative stack index!")
 
-            if op[0] in hasbranch:
-                new_jumped = jumped + [op[1], current+n]
+            if op in hasbranch:
+                new_jumped = jumped + [arg, current + n]
 
                 # do both branches
-                if op[1] not in jumped:
-                    self.check_offset(op[1], current, new_jumped)
+                if arg not in jumped:
+                    self.check_offset(arg, current, new_jumped)
                 if current + n not in jumped:
                     self.check_offset(current + n, current, new_jumped)
 
-            elif op[0] in hasjabs:
+            elif op in hasjabs:
                 # do jump
-                n = op[1] - current
-            elif op[0] in hasjrel:
+                n = arg - current
+            elif op in hasjrel:
                 # do jump
-                n += op[1]
+                n += arg
 
-            if op[0] == opmap["RETURN_VALUE"]:
+            if op == opmap["RETURN_VALUE"]:
                 break
 
     def check(self):

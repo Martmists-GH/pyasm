@@ -27,12 +27,12 @@ class Deserializer:
         lbls = []
         for (i, op, arg) in _unpack_opargs(self.code.co_code):
             if op in hasjrel:
-                idx = i + (arg + 1) * 2
+                idx = i + arg * 2
                 if idx not in lbls:
                     lbls.append(idx)
             elif op in hasjabs:
-                if arg * 2 not in lbls:
-                    lbls.append(arg * 2)
+                if arg*2 not in lbls:
+                    lbls.append(arg*2)
         return lbls
 
     def deserialize(self) -> List[Union[Opcode, Label]]:
@@ -62,7 +62,7 @@ class Deserializer:
             elif op in hasjabs:
                 arg = label_objs[arg*2]
             elif op in hasjrel:
-                arg = label_objs[i+(arg+1)*2]
+                arg = label_objs[i + arg * 2]
 
             cls = ALL_OPS[op]
 

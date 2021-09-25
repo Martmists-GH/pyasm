@@ -88,6 +88,6 @@ class RelJumpOp(JumpOp):
         super().__init__(id, arg)
 
     def serialize(self, ctx: 'Serializer') -> bytes:
-        from_index = ctx.current_index+2
-        to_index = self.arg*2
-        return self.int_arg((to_index - from_index) // 2)
+        from_index = ctx.current_index
+        to_index = self.arg
+        return self.int_arg(to_index - from_index)
