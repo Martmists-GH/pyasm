@@ -1,8 +1,9 @@
 import sys
-from opcode import opmap, cmp_op
-from typing import TYPE_CHECKING, Any
+from opcode import opmap
+from typing import TYPE_CHECKING
 
-from asm.ops.abc import Opcode, AbsJumpOp, RelJumpOp
+from asm.ops.abc import Opcode, RelJumpOp
+
 if TYPE_CHECKING:
     from asm.serializer import Label
 
@@ -51,7 +52,6 @@ if sys.version_info < (3, 9):
     class WITH_CLEANUP_FINISH(Opcode):
         def __init__(self):
             super().__init__(opmap["WITH_CLEANUP_START"], 0)
-
 
 if sys.version_info < (3, 9):
     class BUILD_LIST_UNPACK(Opcode):

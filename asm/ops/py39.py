@@ -1,11 +1,11 @@
 import sys
-from opcode import opmap, cmp_op
-from typing import TYPE_CHECKING, Any
+from opcode import opmap
+from typing import TYPE_CHECKING
 
-from asm.ops.abc import Opcode, AbsJumpOp, RelJumpOp
+from asm.ops.abc import Opcode, AbsJumpOp
+
 if TYPE_CHECKING:
     from asm.serializer import Label
-
 
 if sys.version_info < (3, 10):
     class RERAISE(Opcode):

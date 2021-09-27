@@ -1,4 +1,3 @@
-import sys
 from dataclasses import dataclass
 from struct import pack
 from typing import TYPE_CHECKING, Any

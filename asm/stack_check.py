@@ -16,8 +16,6 @@ class StackChecker:
         self.max = 0
 
     def check_offset(self, offset: int, current: int, jumped: list):
-        # TODO: Support infinite loops
-
         n = 0
         while 2 * (offset + n) < len(self.code):
             op = self.code[2 * (offset + n):]
@@ -38,13 +36,16 @@ class StackChecker:
                     self.check_offset(arg, current, new_jumped)
                 if current + n not in jumped:
                     self.check_offset(current + n, current, new_jumped)
+                return
 
-            elif op in hasjabs:
+            elif op in hasjabs and arg not in jumped:
                 # do jump
-                n = arg - current
-            elif op in hasjrel:
+                self.check_offset(arg, current, jumped + [arg])
+                return
+            elif op in hasjrel and offset + n + arg not in jumped:
                 # do jump
-                n += arg
+                self.check_offset(offset + n + arg, current, jumped + [offset + n + arg])
+                return
 
             if op == opmap["RETURN_VALUE"]:
                 break

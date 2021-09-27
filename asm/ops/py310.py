@@ -1,10 +1,6 @@
-import sys
-from opcode import opmap, cmp_op
-from typing import TYPE_CHECKING, Any
+from opcode import opmap
 
-from asm.ops.abc import Opcode, AbsJumpOp, RelJumpOp
-if TYPE_CHECKING:
-    from asm.serializer import Label
+from asm.ops.abc import Opcode
 
 
 class GET_LEN(Opcode):

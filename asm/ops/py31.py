@@ -1,8 +1,8 @@
-import sys
-from opcode import opmap, cmp_op
-from typing import TYPE_CHECKING, Any
+from opcode import opmap
+from typing import TYPE_CHECKING
 
-from asm.ops.abc import Opcode, AbsJumpOp, RelJumpOp
+from asm.ops.abc import Opcode, AbsJumpOp
+
 if TYPE_CHECKING:
     from asm.serializer import Label
 
@@ -25,7 +25,6 @@ class POP_JUMP_IF_FALSE(AbsJumpOp):
 class POP_JUMP_IF_TRUE(AbsJumpOp):
     def __init__(self, arg: 'Label'):
         super().__init__(opmap["POP_JUMP_IF_TRUE"], arg)
-
 
 
 class LIST_APPEND(Opcode):

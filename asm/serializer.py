@@ -1,5 +1,5 @@
-from dis import _unpack_opargs, dis
-from opcode import hasjrel, hasjabs, hasconst, hasname, haslocal, cmp_op, hascompare, stack_effect, hasfree
+from dis import _unpack_opargs
+from opcode import hasjrel, hasjabs, hasconst, hasname, haslocal, cmp_op, hascompare, hasfree
 from types import CodeType
 from typing import List, Union
 
@@ -31,8 +31,8 @@ class Deserializer:
                 if idx not in lbls:
                     lbls.append(idx)
             elif op in hasjabs:
-                if arg*2 not in lbls:
-                    lbls.append(arg*2)
+                if arg * 2 not in lbls:
+                    lbls.append(arg * 2)
         return lbls
 
     def deserialize(self) -> List[Union[Opcode, Label]]:
@@ -58,9 +58,9 @@ class Deserializer:
                 if arg < n:
                     arg = self.code.co_cellvars[arg]
                 else:
-                    arg = self.code.co_freevars[arg-n]
+                    arg = self.code.co_freevars[arg - n]
             elif op in hasjabs:
-                arg = label_objs[arg*2]
+                arg = label_objs[arg * 2]
             elif op in hasjrel:
                 arg = label_objs[i + arg * 2]
 
@@ -108,5 +108,4 @@ class Serializer:
         self.code = self.code.replace(co_code=data,
                                       co_stacksize=self.calculate_stack(data),
                                       co_nlocals=len(self.code.co_varnames) + self.code.co_argcount)
-        # dis(self.code)
         return self.code

@@ -237,7 +237,6 @@ if sys.version_info < (3, 8):
         def __init__(self):
             super().__init__(opmap["BREAK_LOOP"], 0)
 
-
 if sys.version_info < (3, 5):
     class WITH_CLEANUP(Opcode):
         def __init__(self):

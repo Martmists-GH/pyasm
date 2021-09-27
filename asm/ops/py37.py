@@ -1,11 +1,6 @@
-import sys
-from opcode import opmap, cmp_op
-from typing import TYPE_CHECKING, Any
+from opcode import opmap
 
-from asm.ops.abc import Opcode, AbsJumpOp, RelJumpOp, NameOp
-
-if TYPE_CHECKING:
-    from asm.serializer import Label
+from asm.ops.abc import Opcode, NameOp
 
 
 class LOAD_METHOD(NameOp):
