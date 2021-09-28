@@ -1,3 +1,4 @@
+import dis
 from asm.ops import *
 from asm.serializer import Serializer, Deserializer, Label
 
