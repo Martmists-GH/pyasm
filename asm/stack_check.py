@@ -2,11 +2,11 @@ from opcode import opmap, hasjrel, hasjabs, stack_effect
 from struct import unpack
 
 hasbranch = [
-    opmap["JUMP_IF_FALSE_OR_POP"],
-    opmap["JUMP_IF_TRUE_OR_POP"],
-    opmap["POP_JUMP_IF_FALSE"],
-    opmap["POP_JUMP_IF_TRUE"],
-    opmap["JUMP_IF_NOT_EXC_MATCH"],
+    opmap.get("JUMP_IF_FALSE_OR_POP"),
+    opmap.get("JUMP_IF_TRUE_OR_POP"),
+    opmap.get("POP_JUMP_IF_FALSE"),
+    opmap.get("POP_JUMP_IF_TRUE"),
+    opmap.get("JUMP_IF_NOT_EXC_MATCH"),
 ]
 
 
