@@ -1,3 +1,4 @@
+import sys
 from opcode import opmap
 from typing import TYPE_CHECKING
 
@@ -17,6 +18,7 @@ class DELETE_DEREF(CellOp):
         super().__init__(opmap["DELETE_DEREF"], arg)
 
 
-class SETUP_WITH(RelJumpOp):
-    def __init__(self, arg: 'Label'):
-        super().__init__(opmap["SETUP_WITH"], arg)
+if sys.version_info < (3, 11):
+    class SETUP_WITH(RelJumpOp):
+        def __init__(self, arg: 'Label'):
+            super().__init__(opmap["SETUP_WITH"], arg)

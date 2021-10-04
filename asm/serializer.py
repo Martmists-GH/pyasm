@@ -3,6 +3,7 @@ from opcode import hasjrel, hasjabs, hasconst, hasname, haslocal, cmp_op, hascom
 from types import CodeType
 from typing import List, Union
 
+from asm import MultiOp
 from asm.ops import Opcode, ALL_OPS
 from asm.stack_check import StackChecker
 
@@ -40,6 +41,11 @@ class Deserializer:
         label_objs = {it: Label() for it in labels}
         elements = []
         for (i, op, arg) in _unpack_opargs(self.code.co_code):
+            cls = ALL_OPS[op]
+
+            if issubclass(cls, MultiOp):
+                raise NotImplementedError("_unpack_opargs does not support multiple arguments yet! ({0})".format(cls.__name__))
+
             for k, l in label_objs.items():
                 if i == k:
                     elements.append(l)
@@ -63,8 +69,6 @@ class Deserializer:
                 arg = label_objs[arg * 2]
             elif op in hasjrel:
                 arg = label_objs[i + arg * 2]
-
-            cls = ALL_OPS[op]
 
             if op < 90:
                 x = cls()
@@ -107,5 +111,5 @@ class Serializer:
 
         self.code = self.code.replace(co_code=data,
                                       co_stacksize=self.calculate_stack(data),
-                                      co_nlocals=len(self.code.co_varnames) + self.code.co_argcount)
+                                      co_nlocals=len(self.code.co_varnames))
         return self.code

@@ -90,3 +90,22 @@ class RelJumpOp(JumpOp):
         from_index = ctx.current_index
         to_index = self.arg
         return self.int_arg(to_index - from_index)
+
+
+# Used only in 3.11+
+class MultiOp(Opcode):
+    def __init__(self, id: int, arg: tuple):
+        super().__init__(id, arg)
+
+    def serialize(self, ctx: 'Serializer') -> bytes:
+        l = self.serialize_left(ctx, self.arg[0])
+        r = self.serialize_right(ctx, self.arg[1])
+
+        fmt = "B" + "Bb"[l < 0] + "B" + "Bb"[r < 0]
+        return pack(fmt, self.id, l, 0, r)
+
+    def serialize_left(self, ctx: 'Serializer', arg) -> int:
+        raise NotImplementedError()
+
+    def serialize_right(self, ctx: 'Serializer', arg) -> int:
+        raise NotImplementedError()

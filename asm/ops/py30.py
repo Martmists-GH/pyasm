@@ -258,9 +258,10 @@ class YIELD_VALUE(Opcode):
         super().__init__(opmap["YIELD_VALUE"], 0)
 
 
-class POP_BLOCK(Opcode):
-    def __init__(self):
-        super().__init__(opmap["POP_BLOCK"], 0)
+if sys.version_info < (3, 11):
+    class POP_BLOCK(Opcode):
+        def __init__(self):
+            super().__init__(opmap["POP_BLOCK"], 0)
 
 
 if sys.version_info < (3, 9):
@@ -417,9 +418,10 @@ if sys.version_info < (3, 8):
             super().__init__(opmap["SETUP_EXCEPT"], arg)
 
 
-class SETUP_FINALLY(RelJumpOp):
-    def __init__(self, arg: 'Label'):
-        super().__init__(opmap["SETUP_FINALLY"], arg)
+if sys.version_info < (3, 11):
+    class SETUP_FINALLY(RelJumpOp):
+        def __init__(self, arg: 'Label'):
+            super().__init__(opmap["SETUP_FINALLY"], arg)
 
 
 class LOAD_FAST(VarOp):

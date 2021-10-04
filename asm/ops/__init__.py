@@ -33,9 +33,12 @@ if sys.version_info >= (3, 9, 0):
 if sys.version_info >= (3, 10, 0):
     from asm.ops.py310 import *
 
+if sys.version_info >= (3, 11, 0):
+    from asm.ops.py311 import *
+
 ALL_OPS = {v: eval(k) for k, v in opmap.items()}
 
 __all__ = tuple(dis.opmap.keys()) + (
     "Opcode", "JumpOp", "RelJumpOp", "AbsJumpOp",
-    "NameOp", "VarOp", "ConstOp", "CellOp"
+    "NameOp", "VarOp", "ConstOp", "CellOp", "MultiOp"
 )

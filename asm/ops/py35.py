@@ -79,6 +79,7 @@ if sys.version_info < (3, 9):
             super().__init__(opmap["BUILD_SET_UNPACK"], arg)
 
 
-class SETUP_ASYNC_WITH(RelJumpOp):
-    def __init__(self, arg: 'Label'):
-        super().__init__(opmap["SETUP_ASYNC_WITH"], arg)
+if sys.version_info < (3, 11):
+    class SETUP_ASYNC_WITH(RelJumpOp):
+        def __init__(self, arg: 'Label'):
+            super().__init__(opmap["SETUP_ASYNC_WITH"], arg)
