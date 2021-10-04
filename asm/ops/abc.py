@@ -101,11 +101,10 @@ class MultiOp(Opcode):
         l = self.serialize_left(ctx, self.arg[0])
         r = self.serialize_right(ctx, self.arg[1])
 
-        fmt = "B" + "Bb"[l < 0] + "B" + "Bb"[r < 0]
-        return pack(fmt, self.id, l, 0, r)
+        return l + r
 
-    def serialize_left(self, ctx: 'Serializer', arg) -> int:
+    def serialize_left(self, ctx: 'Serializer', arg) -> bytes:
         raise NotImplementedError()
 
-    def serialize_right(self, ctx: 'Serializer', arg) -> int:
+    def serialize_right(self, ctx: 'Serializer', arg) -> bytes:
         raise NotImplementedError()

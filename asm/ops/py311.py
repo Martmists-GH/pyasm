@@ -156,33 +156,33 @@ class LOAD_FAST__LOAD_FAST(MultiOp):
     def __init__(self, arg: Tuple[str, str]):
         super().__init__(opmap["LOAD_FAST__LOAD_FAST"], arg)
 
-    def serialize_left(self, ctx: 'Serializer', arg) -> int:
-        return VarOp(0, arg).serialize(ctx)[1]
+    def serialize_left(self, ctx: 'Serializer', arg) -> bytes:
+        return VarOp(self.id, arg).serialize(ctx)
 
-    def serialize_right(self, ctx: 'Serializer', arg) -> int:
-        return VarOp(0, arg).serialize(ctx)[1]
+    def serialize_right(self, ctx: 'Serializer', arg) -> bytes:
+        return VarOp(opmap["LOAD_FAST"], arg).serialize(ctx)
 
 
 class STORE_FAST__LOAD_FAST(MultiOp):
     def __init__(self, arg: Tuple[str, str]):
         super().__init__(opmap["STORE_FAST__LOAD_FAST"], arg)
 
-    def serialize_left(self, ctx: 'Serializer', arg) -> int:
-        return VarOp(0, arg).serialize(ctx)[1]
+    def serialize_left(self, ctx: 'Serializer', arg) -> bytes:
+        return VarOp(self.id, arg).serialize(ctx)
 
-    def serialize_right(self, ctx: 'Serializer', arg) -> int:
-        return VarOp(0, arg).serialize(ctx)[1]
+    def serialize_right(self, ctx: 'Serializer', arg) -> bytes:
+        return VarOp(opmap["LOAD_FAST"], arg).serialize(ctx)
 
 
 class LOAD_FAST__LOAD_CONST(MultiOp):
     def __init__(self, arg: Tuple[str, Any]):
         super().__init__(opmap["LOAD_FAST__LOAD_CONST"], arg)
 
-    def serialize_left(self, ctx: 'Serializer', arg) -> int:
-        return VarOp(0, arg).serialize(ctx)[1]
+    def serialize_left(self, ctx: 'Serializer', arg) -> bytes:
+        return VarOp(self.id, arg).serialize(ctx)
 
-    def serialize_right(self, ctx: 'Serializer', arg) -> int:
-        return ConstOp(0, arg).serialize(ctx)[1]
+    def serialize_right(self, ctx: 'Serializer', arg) -> bytes:
+        return ConstOp(opmap["LOAD_CONST"], arg).serialize(ctx)
 
 
 class MAKE_CELL(Opcode):
@@ -194,22 +194,22 @@ class LOAD_CONST__LOAD_FAST(MultiOp):
     def __init__(self, arg: Tuple[Any, str]):
         super().__init__(opmap["LOAD_CONST__LOAD_FAST"], arg)
 
-    def serialize_left(self, ctx: 'Serializer', arg) -> int:
-        return ConstOp(0, arg).serialize(ctx)[1]
+    def serialize_left(self, ctx: 'Serializer', arg) -> bytes:
+        return ConstOp(self.id, arg).serialize(ctx)
 
-    def serialize_right(self, ctx: 'Serializer', arg) -> int:
-        return VarOp(0, arg).serialize(ctx)[1]
+    def serialize_right(self, ctx: 'Serializer', arg) -> bytes:
+        return VarOp(opmap["LOAD_FAST"], arg).serialize(ctx)
 
 
 class STORE_FAST__STORE_FAST(MultiOp):
     def __init__(self, arg: Tuple[str, str]):
         super().__init__(opmap["STORE_FAST__STORE_FAST"], arg)
 
-    def serialize_left(self, ctx: 'Serializer', arg) -> int:
-        return VarOp(0, arg).serialize(ctx)[1]
+    def serialize_left(self, ctx: 'Serializer', arg) -> bytes:
+        return VarOp(self.id, arg).serialize(ctx)
 
-    def serialize_right(self, ctx: 'Serializer', arg) -> int:
-        return VarOp(0, arg).serialize(ctx)[1]
+    def serialize_right(self, ctx: 'Serializer', arg) -> bytes:
+        return VarOp(opmap["STORE_FAST"], arg).serialize(ctx)
 
 
 class CALL_METHOD_KW(Opcode):

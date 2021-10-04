@@ -39,11 +39,9 @@ class Deserializer:
         labels = sorted(self.find_labels())
         label_objs = {it: Label() for it in labels}
         elements = []
+        waiting_element = None
         for (i, op, arg) in _unpack_opargs(self.code.co_code):
             cls = ALL_OPS[op]
-
-            if issubclass(cls, MultiOp):
-                raise NotImplementedError("_unpack_opargs does not support multiple arguments yet! ({0})".format(cls.__name__))
 
             for k, l in label_objs.items():
                 if i == k:
@@ -74,7 +72,14 @@ class Deserializer:
             else:
                 x = cls(arg)
 
-            elements.append(x)
+            if waiting_element is not None:
+                x, waiting_element = waiting_element, None
+                x.arg = (x.arg, arg)
+
+            if issubclass(cls, MultiOp):
+                waiting_element = x
+            else:
+                elements.append(x)
 
         return elements
 
