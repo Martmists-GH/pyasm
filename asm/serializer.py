@@ -97,6 +97,8 @@ class Serializer:
         for x in self.ops:
             if not isinstance(x, Label):
                 self.current_index += 2
+                if isinstance(x, MultiOp):
+                    self.current_index += 2  # Offset 2 more
             else:
                 x.set(self.current_index)
 
@@ -107,6 +109,8 @@ class Serializer:
             if isinstance(x, Opcode):
                 data += x.serialize(self)
                 self.current_index += 2
+                if isinstance(x, MultiOp):
+                    self.current_index += 2  # Offset 2 more
 
         self.code = self.code.replace(co_code=data,
                                       co_stacksize=self.calculate_stack(data),
