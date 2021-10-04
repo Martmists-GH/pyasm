@@ -40,7 +40,7 @@ class Label:
 
     def set(self, index: int):
         for p in self.parents:
-            p.arg = int(index / 2)
+            p.arg = int(index / 2) if sys.version_info >= (3, 10) else index
 
     def __repr__(self):
         return "Label({0})".format(hex(id(self)))
@@ -54,7 +54,7 @@ class Deserializer:
         lbls = []
         for (i, op, arg) in _unpack_opargs(self.code.co_code):
             if op in hasjrel:
-                idx = i + arg * 2
+                idx = (i + arg * 2) if sys.version_info >= (3, 10) else (i + arg)
                 if idx not in lbls:
                     lbls.append(idx)
             elif op in hasjabs:
