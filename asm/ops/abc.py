@@ -31,8 +31,11 @@ class ConstOp(Opcode):
         super().__init__(id, arg)
 
     def serialize(self, ctx: 'Serializer') -> bytes:
+        from asm.serializer import code_replace
+
         if self.arg not in ctx.code.co_consts:
-            ctx.code = ctx.code.replace(
+            ctx.code = code_replace(
+                ctx.code,
                 co_consts=ctx.code.co_consts + (self.arg,),
             )
         return self.int_arg(ctx.code.co_consts.index(self.arg))
@@ -43,8 +46,11 @@ class NameOp(Opcode):
         super().__init__(id, arg)
 
     def serialize(self, ctx: 'Serializer') -> bytes:
+        from asm.serializer import code_replace
+
         if self.arg not in ctx.code.co_names:
-            ctx.code = ctx.code.replace(
+            ctx.code = code_replace(
+                ctx.code,
                 co_names=ctx.code.co_names + (self.arg,),
             )
         return self.int_arg(ctx.code.co_names.index(self.arg))
@@ -55,8 +61,11 @@ class VarOp(Opcode):
         super().__init__(id, arg)
 
     def serialize(self, ctx: 'Serializer') -> bytes:
+        from asm.serializer import code_replace
+
         if self.arg not in ctx.code.co_varnames:
-            ctx.code = ctx.code.replace(
+            ctx.code = code_replace(
+                ctx.code,
                 co_varnames=ctx.code.co_varnames + (self.arg,),
             )
         return self.int_arg(ctx.code.co_varnames.index(self.arg))

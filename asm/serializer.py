@@ -1,3 +1,4 @@
+import sys
 from dis import _unpack_opargs
 from opcode import hasjrel, hasjabs, hasconst, hasname, haslocal, cmp_op, hascompare, hasfree
 from types import CodeType
@@ -5,6 +6,32 @@ from typing import List, Union
 
 from asm.ops import Opcode, ALL_OPS, MultiOp
 from asm.stack_check import StackChecker
+
+
+def code_replace(code_obj: CodeType, **kwargs) -> CodeType:
+    if sys.version_info >= (3, 8):
+        return code_obj.replace(**kwargs)
+
+    def _(n: str):
+        return kwargs.get(n, getattr(code_obj, n))
+
+    return CodeType(
+        _("co_argcount"),
+        _("co_kwonlyargcount"),
+        _("co_nlocals"),
+        _("co_stacksize"),
+        _("co_flags"),
+        _("co_code"),
+        _("co_consts"),
+        _("co_names"),
+        _("co_varnames"),
+        _("co_filename"),
+        _("co_name"),
+        _("co_firstlineno"),
+        _("co_lnotab"),
+        _("co_freevars"),
+        _("co_cellvars")
+    )
 
 
 class Label:
@@ -31,8 +58,9 @@ class Deserializer:
                 if idx not in lbls:
                     lbls.append(idx)
             elif op in hasjabs:
-                if arg * 2 not in lbls:
-                    lbls.append(arg * 2)
+                idx = arg * 2 if sys.version_info >= (3, 10) else arg
+                if idx not in lbls:
+                    lbls.append(idx)
         return lbls
 
     def deserialize(self) -> List[Union[Opcode, Label]]:
@@ -63,7 +91,8 @@ class Deserializer:
                 else:
                     arg = self.code.co_freevars[arg - n]
             elif op in hasjabs:
-                arg = label_objs[arg * 2]
+                idx = arg * 2 if sys.version_info >= (3, 10) else arg
+                arg = label_objs[idx]
             elif op in hasjrel:
                 arg = label_objs[i + arg * 2]
 
@@ -117,7 +146,8 @@ class Serializer:
                 if isinstance(x, MultiOp):
                     self.current_index += 2  # Offset 2 more
 
-        self.code = self.code.replace(co_code=data,
-                                      co_stacksize=self.calculate_stack(data),
-                                      co_nlocals=len(self.code.co_varnames))
+        self.code = code_replace(self.code,
+                                 co_code=data,
+                                 co_stacksize=self.calculate_stack(data),
+                                 co_nlocals=len(self.code.co_varnames))
         return self.code
