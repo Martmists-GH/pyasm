@@ -3,8 +3,7 @@ from opcode import hasjrel, hasjabs, hasconst, hasname, haslocal, cmp_op, hascom
 from types import CodeType
 from typing import List, Union
 
-from asm import MultiOp
-from asm.ops import Opcode, ALL_OPS
+from asm.ops import Opcode, ALL_OPS, MultiOp
 from asm.stack_check import StackChecker
 
 
