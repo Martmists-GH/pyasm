@@ -363,7 +363,10 @@ class LOAD_ATTR(NameOp):
 
 class COMPARE_OP(Opcode):
     def __init__(self, arg: str):
-        super().__init__(opmap["COMPARE_OP"], cmp_op.index(arg))
+        super().__init__(opmap["COMPARE_OP"], arg)
+
+    def serialize(self, ctx: 'Serializer') -> bytes:
+        return self.int_arg(cmp_op.index(self.arg))
 
 
 class IMPORT_NAME(NameOp):

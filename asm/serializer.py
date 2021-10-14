@@ -54,7 +54,7 @@ class Deserializer:
         lbls = []
         for (i, op, arg) in _unpack_opargs(self.code.co_code):
             if op in hasjrel:
-                idx = (i + arg * 2) if sys.version_info >= (3, 10) else (i + arg)
+                idx = (i + (arg + 1) * 2) if sys.version_info >= (3, 10) else (i + arg + 2)
                 if idx not in lbls:
                     lbls.append(idx)
             elif op in hasjabs:
@@ -94,7 +94,8 @@ class Deserializer:
                 idx = arg * 2 if sys.version_info >= (3, 10) else arg
                 arg = label_objs[idx]
             elif op in hasjrel:
-                arg = label_objs[i + arg * 2]
+                idx = (i + (arg + 1) * 2) if sys.version_info >= (3, 10) else (i + arg + 2)
+                arg = label_objs[idx]
 
             if op < 90:
                 x = cls()

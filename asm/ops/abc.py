@@ -15,7 +15,7 @@ class Opcode:
         return self.int_arg(self.arg)
 
     def int_arg(self, x: int) -> bytes:
-        return pack("Bb" if x < 0 else "BB", self.id, x)
+        return pack("Bb" if x < 0 else "BB", self.id, x & 0xFF)
 
 
 class JumpOp(Opcode):
