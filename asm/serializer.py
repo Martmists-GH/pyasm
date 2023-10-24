@@ -1,10 +1,10 @@
 import sys
-from dis import _unpack_opargs
-from opcode import hasjrel, hasjabs, hasconst, hasname, haslocal, cmp_op, hascompare, hasfree
+from dis import _unpack_opargs, _inline_cache_entries, _deoptop
+from opcode import hasjrel, hasjabs, hasconst, hasname, haslocal, cmp_op, hascompare, hasfree, opmap
 from types import CodeType
 from typing import List, Union
 
-from asm.ops import Opcode, ALL_OPS, MultiOp
+from asm.ops import Opcode, ALL_OPS, MultiOp, BackRelJumpOp, CACHE
 from asm.stack_check import StackChecker
 
 
@@ -40,7 +40,7 @@ class Label:
 
     def set(self, index: int):
         for p in self.parents:
-            p.arg = int(index / 2) if sys.version_info >= (3, 10) else index
+            p.arg = index
 
     def __repr__(self):
         return "Label({0})".format(hex(id(self)))
@@ -54,7 +54,10 @@ class Deserializer:
         lbls = []
         for (i, op, arg) in _unpack_opargs(self.code.co_code):
             if op in hasjrel:
-                idx = (i + (arg + 1) * 2) if sys.version_info >= (3, 10) else (i + arg + 2)
+                if issubclass(ALL_OPS[op], BackRelJumpOp):
+                    idx = (i - arg * 2)
+                else:
+                    idx = (i + (arg + 1) * 2) if sys.version_info >= (3, 10) else (i + arg + 2)
                 if idx not in lbls:
                     lbls.append(idx)
             elif op in hasjabs:
@@ -68,8 +71,17 @@ class Deserializer:
         label_objs = {it: Label() for it in labels}
         elements = []
         waiting_element = None
+        lasti = 0
         for (i, op, arg) in _unpack_opargs(self.code.co_code):
+            if sys.version_info >= (3, 11):
+                diff = i - lasti
+                if diff > 2:
+                    for _ in range(int((diff - 2) / 2)):
+                        elements.append(CACHE())
+                lasti = i
+
             cls = ALL_OPS[op]
+            extra = []
 
             for k, l in label_objs.items():
                 if i == k:
@@ -79,6 +91,10 @@ class Deserializer:
             if op in hasconst:
                 arg = self.code.co_consts[arg]
             elif op in hasname:
+                # TODO: Find which exact version changed this
+                if sys.version_info >= (3, 11) and op == opmap["LOAD_GLOBAL"]:
+                    extra.append(arg & 1)
+                    arg >>= 1
                 arg = self.code.co_names[arg]
             elif op in haslocal:
                 arg = self.code.co_varnames[arg]
@@ -94,13 +110,16 @@ class Deserializer:
                 idx = arg * 2 if sys.version_info >= (3, 10) else arg
                 arg = label_objs[idx]
             elif op in hasjrel:
-                idx = (i + (arg + 1) * 2) if sys.version_info >= (3, 10) else (i + arg + 2)
+                if issubclass(ALL_OPS[op], BackRelJumpOp):
+                    idx = (i - arg * 2)
+                else:
+                    idx = (i + (arg + 1) * 2) if sys.version_info >= (3, 10) else (i + arg + 2)
                 arg = label_objs[idx]
 
             if op < 90:
                 x = cls()
             else:
-                x = cls(arg)
+                x = cls(arg, *extra)
 
             if waiting_element is not None:
                 x, waiting_element = waiting_element, None
@@ -110,6 +129,8 @@ class Deserializer:
                 waiting_element = x
             else:
                 elements.append(x)
+
+        elements = [x for x in elements if not isinstance(x, CACHE)]
 
         return elements
 
@@ -128,6 +149,18 @@ class Serializer:
 
     def serialize(self) -> CodeType:
         self.current_index = 0
+
+        prev_ops = self.ops
+        self.ops = []
+
+        # Fill CACHEs
+        if sys.version_info >= (3, 11):
+            for op in prev_ops:
+                self.ops.append(op)
+                if isinstance(op, Opcode):
+                    cache_num = _inline_cache_entries[_deoptop(op.id)]
+                    for i in range(cache_num):
+                        self.ops.append(CACHE())
 
         for x in self.ops:
             if not isinstance(x, Label):

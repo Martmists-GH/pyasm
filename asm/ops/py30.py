@@ -401,8 +401,23 @@ class JUMP_ABSOLUTE(AbsJumpOp):
 
 
 class LOAD_GLOBAL(NameOp):
-    def __init__(self, arg: str):
+    def __init__(self, arg: str, with_null: bool = False):
         super().__init__(opmap["LOAD_GLOBAL"], arg)
+        self.with_null = with_null
+
+    def serialize(self, ctx: 'Serializer') -> bytes:
+        from asm.serializer import code_replace
+
+        if self.arg not in ctx.code.co_names:
+            ctx.code = code_replace(
+                ctx.code,
+                co_names=ctx.code.co_names + (self.arg,),
+            )
+        arg = ctx.code.co_names.index(self.arg)
+        # TODO: Find exact version that changed this
+        if sys.version_info >= (3, 11):
+            arg = (arg << 1) | self.with_null
+        return self.int_arg(arg)
 
 
 if sys.version_info < (3, 8):

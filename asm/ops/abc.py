@@ -1,3 +1,4 @@
+import sys
 from dataclasses import dataclass
 from struct import pack
 from typing import TYPE_CHECKING, Any
@@ -15,7 +16,7 @@ class Opcode:
         return self.int_arg(self.arg)
 
     def int_arg(self, x: int) -> bytes:
-        return pack("Bb" if x < 0 else "BB", self.id, x & 0xFF)
+        return pack("BB", self.id, x & 0xFF)
 
 
 class JumpOp(Opcode):
@@ -66,6 +67,7 @@ class VarOp(Opcode):
         if self.arg not in ctx.code.co_varnames:
             ctx.code = code_replace(
                 ctx.code,
+                co_nlocals=ctx.code.co_nlocals + 1,
                 co_varnames=ctx.code.co_varnames + (self.arg,),
             )
         return self.int_arg(ctx.code.co_varnames.index(self.arg))
@@ -98,7 +100,23 @@ class RelJumpOp(JumpOp):
     def serialize(self, ctx: 'Serializer') -> bytes:
         from_index = ctx.current_index
         to_index = self.arg
-        return self.int_arg(to_index - from_index)
+        diff = to_index - from_index
+        if sys.version_info >= (3, 10):
+            diff = int(diff / 2)
+        return self.int_arg(diff)
+
+
+class BackRelJumpOp(RelJumpOp):
+    def __init__(self, id: int, arg: 'Label'):
+        super().__init__(id, arg)
+
+    def serialize(self, ctx: 'Serializer') -> bytes:
+        from_index = ctx.current_index
+        to_index = self.arg
+        diff = -(to_index - from_index)
+        if sys.version_info >= (3, 10):
+            diff = int(diff / 2)
+        return self.int_arg(diff)
 
 
 # Used only in 3.11+
