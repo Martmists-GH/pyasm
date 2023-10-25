@@ -100,7 +100,7 @@ class RelJumpOp(JumpOp):
     def serialize(self, ctx: 'Serializer') -> bytes:
         from_index = ctx.current_index
         to_index = self.arg
-        diff = to_index - from_index
+        diff = to_index - from_index - 2
         if sys.version_info >= (3, 10):
             diff = int(diff / 2)
         return self.int_arg(diff)
