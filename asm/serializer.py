@@ -1,11 +1,15 @@
 import sys
-from dis import _unpack_opargs, _inline_cache_entries, _deoptop
+from dis import _unpack_opargs
 from opcode import hasjrel, hasjabs, hasconst, hasname, haslocal, cmp_op, hascompare, hasfree, opmap
 from types import CodeType
 from typing import List, Union
 
-from asm.ops import Opcode, ALL_OPS, MultiOp, BackRelJumpOp, CACHE
+from asm.ops import Opcode, ALL_OPS, MultiOp, BackRelJumpOp
 from asm.stack_check import StackChecker
+
+if sys.version_info >= (3, 11):
+    from dis import _inline_cache_entries, _deoptop
+    from asm.ops import CACHE
 
 
 def code_replace(code_obj: CodeType, **kwargs) -> CodeType:
