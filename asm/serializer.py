@@ -134,7 +134,8 @@ class Deserializer:
             else:
                 elements.append(x)
 
-        elements = [x for x in elements if not isinstance(x, CACHE)]
+        if sys.version_info >= (3, 11):
+            elements = [x for x in elements if not isinstance(x, CACHE)]
 
         return elements
 
